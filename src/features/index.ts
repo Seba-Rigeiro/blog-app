@@ -2,4 +2,4 @@
  * Features por dominio (auth, articles, search).
  */
 
-export {};
+export { ArticleForm, type ArticleFormData } from "./articles";

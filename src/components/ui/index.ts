@@ -2,4 +2,6 @@
  * Componentes UI reutilizables.
  */
 
-export {};
+export { FormField } from "./FormField";
+export { Input } from "./input";
+export { Textarea } from "./textarea";
