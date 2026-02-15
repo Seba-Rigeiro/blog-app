@@ -12,7 +12,11 @@ import {
   deleteArticleSchema,
 } from "@/schemas/articles";
 import { paginationInputSchema, getSkipTake } from "@/schemas/pagination";
-import { createArticle as dbCreateArticle, getArticlesCollection } from "@/db";
+import {
+  createArticle as dbCreateArticle,
+  getArticlesCollection,
+  getAuthorNames,
+} from "@/db";
 import { protectedProcedure, publicProcedure, router } from "../init";
 
 function toPublicArticle(doc: {
@@ -86,9 +90,13 @@ export const articleRouter = router({
         });
       const items = await cursor.toArray();
       const nextCursor = items.length > take ? String(skip + take) : undefined;
+      const authorIds = [
+        ...new Set(items.slice(0, take).map((d) => d.authorId)),
+      ];
+      const nameByAuthor = await getAuthorNames(authorIds);
       return {
-        items: items.slice(0, take).map((d) =>
-          toPublicArticle({
+        items: items.slice(0, take).map((d) => ({
+          ...toPublicArticle({
             _id: d._id,
             title: d.title,
             content: d.content,
@@ -97,7 +105,8 @@ export const articleRouter = router({
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
           }),
-        ),
+          authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
+        })),
         nextCursor,
       };
     }),
@@ -122,9 +131,13 @@ export const articleRouter = router({
         });
       const items = await cursor.toArray();
       const nextCursor = items.length > take ? String(skip + take) : undefined;
+      const authorIds = [
+        ...new Set(items.slice(0, take).map((d) => d.authorId)),
+      ];
+      const nameByAuthor = await getAuthorNames(authorIds);
       return {
-        items: items.slice(0, take).map((d) =>
-          toPublicArticle({
+        items: items.slice(0, take).map((d) => ({
+          ...toPublicArticle({
             _id: d._id,
             title: d.title,
             content: d.content,
@@ -133,7 +146,8 @@ export const articleRouter = router({
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
           }),
-        ),
+          authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
+        })),
         nextCursor,
       };
     }),

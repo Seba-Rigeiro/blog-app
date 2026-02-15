@@ -6,7 +6,7 @@
 import { ObjectId } from "mongodb";
 import { searchArticlesSchema } from "@/schemas/search";
 import { getSkipTake } from "@/schemas/pagination";
-import { ensureIndexes, getArticlesCollection } from "@/db";
+import { ensureIndexes, getArticlesCollection, getAuthorNames } from "@/db";
 import { publicProcedure, router } from "../init";
 
 function toPublicArticle(doc: {
@@ -72,10 +72,14 @@ export const searchRouter = router({
 
       const items = await cursor.toArray();
       const nextCursor = items.length > take ? String(skip + take) : undefined;
+      const authorIds = [
+        ...new Set(items.slice(0, take).map((d) => d.authorId)),
+      ];
+      const nameByAuthor = await getAuthorNames(authorIds);
 
       return {
-        items: items.slice(0, take).map((d) =>
-          toPublicArticle({
+        items: items.slice(0, take).map((d) => ({
+          ...toPublicArticle({
             _id: d._id,
             title: d.title,
             content: d.content,
@@ -84,7 +88,8 @@ export const searchRouter = router({
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
           }),
-        ),
+          authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
+        })),
         nextCursor,
       };
     }),

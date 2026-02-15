@@ -16,3 +16,4 @@ export {
   type CreateUserData,
   type CreateArticleData,
 } from "./queries";
+export { getAuthorNames } from "./authorNames";

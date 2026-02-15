@@ -62,6 +62,7 @@ export function SearchArticles() {
                       id={a.id}
                       title={a.title}
                       createdAt={a.createdAt}
+                      author={a.authorName}
                     />
                   ))}
                 </ul>

@@ -44,6 +44,7 @@ export default function HomePage() {
                 id={a.id}
                 title={a.title}
                 createdAt={a.createdAt}
+                author={a.authorName}
               />
             ))}
           </ul>

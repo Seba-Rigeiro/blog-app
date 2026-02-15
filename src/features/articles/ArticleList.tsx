@@ -6,6 +6,7 @@ export type ArticleListItemData = {
   id: string;
   title: string;
   createdAt: Date | string;
+  authorName?: string;
 };
 
 type ArticleListProps = {
@@ -47,6 +48,7 @@ export function ArticleList({
             id={a.id}
             title={a.title}
             createdAt={a.createdAt}
+            author={a.authorName}
           />
         ))}
       </ul>
