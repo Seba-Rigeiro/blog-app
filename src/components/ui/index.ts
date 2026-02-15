@@ -1,0 +1,5 @@
+/**
+ * Componentes UI reutilizables.
+ */
+
+export {};
