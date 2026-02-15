@@ -26,12 +26,6 @@ export function Header() {
           >
             Artículos
           </Link>
-          <Link
-            href="/search"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Buscar
-          </Link>
           {isPending ? (
             <span className="text-sm text-gray-400">...</span>
           ) : user ? (
