@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LinkButton } from "@/components/ui/LinkButton";
 import { getAuth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { MyArticlesList } from "@/features/articles";
@@ -18,15 +18,14 @@ export default async function DashboardPage() {
     <main className="min-h-screen p-8">
       <h1 className="text-2xl font-bold">Mis artículos</h1>
       <p className="mt-2 text-gray-600">
-        Hola, <strong>{name}</strong>. Aquí puedes ver tus artículos listados.
+        Hola, <strong>{name}</strong>. Aquí puedes ver un listado de todos tus
+        artículos.
       </p>
       <section className="mt-6" aria-label="Listado de mis artículos">
         <MyArticlesList />
       </section>
       <p className="mt-6">
-        <Link href="/" className="text-blue-600 underline">
-          Volver al inicio
-        </Link>
+        <LinkButton href="/">Volver al inicio</LinkButton>
       </p>
     </main>
   );

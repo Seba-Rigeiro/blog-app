@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LinkButton } from "@/components/ui/LinkButton";
 
 export type ArticleDetailData = {
   id: string;
@@ -73,9 +73,7 @@ export function ArticleDetail({
         {article.content}
       </div>
       <p>
-        <Link href="/articles" className="text-blue-600 hover:underline">
-          ← Volver al listado
-        </Link>
+        <LinkButton href="/articles">Volver al listado</LinkButton>
       </p>
     </article>
   );

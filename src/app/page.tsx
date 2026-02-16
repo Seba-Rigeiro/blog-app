@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LinkButton } from "@/components/ui/LinkButton";
 import { trpc } from "@/server/trpc/client";
 import { ArticleListItem, AuthorsSection } from "@/features/articles";
 
@@ -17,7 +17,7 @@ export default function HomePage() {
       <section>
         <h1 className="text-2xl font-bold">Blog CMS</h1>
         <p className="mt-1 text-gray-600">
-          Inicio — últimos artículos y autores
+          Listado de autores y últimos artículos publicados
         </p>
       </section>
 
@@ -26,7 +26,7 @@ export default function HomePage() {
       )}
 
       <section>
-        <h2 className="text-lg font-semibold">Últimos artículos</h2>
+        <h2 className="text-lg font-semibold">Últimos 5 artículos</h2>
         {isLoading && <p className="mt-2 text-gray-500">Cargando…</p>}
         {error && (
           <p className="mt-2 text-red-600" role="alert">
@@ -50,12 +50,9 @@ export default function HomePage() {
           </ul>
         )}
         {listData?.nextCursor != null && (
-          <Link
-            href="/articles"
-            className="mt-3 inline-block text-sm text-blue-600 hover:underline"
-          >
-            Ver todos los artículos →
-          </Link>
+          <LinkButton href="/articles" className="mt-3">
+            Ver todos los artículos
+          </LinkButton>
         )}
       </section>
     </div>
