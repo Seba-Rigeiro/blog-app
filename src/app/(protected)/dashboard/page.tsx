@@ -16,7 +16,10 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen p-8">
-      <h1 className="text-2xl font-bold">Mis artículos</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">Mis artículos</h1>
+        <LinkButton href="/">Volver al inicio</LinkButton>
+      </div>
       <p className="mt-2 text-gray-600">
         Hola, <strong>{name}</strong>. Aquí puedes ver un listado de todos tus
         artículos.
@@ -24,9 +27,6 @@ export default async function DashboardPage() {
       <section className="mt-6" aria-label="Listado de mis artículos">
         <MyArticlesList />
       </section>
-      <p className="mt-6">
-        <LinkButton href="/">Volver al inicio</LinkButton>
-      </p>
     </main>
   );
 }
