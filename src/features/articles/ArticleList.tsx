@@ -1,5 +1,6 @@
 "use client";
 
+import { Pagination } from "@/components/ui/Pagination";
 import { ArticleListItem } from "./ArticleListItem";
 
 export type ArticleListItemData = {
@@ -9,15 +10,22 @@ export type ArticleListItemData = {
   authorName?: string;
 };
 
+const PAGE_SIZE_OPTIONS = [5, 10, 20] as const;
+
 type ArticleListProps = {
   items: ArticleListItemData[];
   isLoading?: boolean;
   /** Error con al menos .message (Error o TRPCClientError) */
   error?: { message: string } | null;
   emptyMessage?: string;
+  pageSize: number;
+  currentCursor: number;
+  totalCount?: number;
   nextCursor?: string | null;
   onNextPage?: (cursor: string) => void;
+  onPrevPage?: () => void;
   onFirstPage?: () => void;
+  onPageSizeChange?: (size: number) => void;
 };
 
 export function ArticleList({
@@ -25,9 +33,13 @@ export function ArticleList({
   isLoading,
   error,
   emptyMessage = "No hay artículos.",
+  pageSize,
+  currentCursor,
+  totalCount,
   nextCursor,
   onNextPage,
-  onFirstPage,
+  onPrevPage,
+  onPageSizeChange,
 }: ArticleListProps) {
   if (isLoading) return <p className="text-gray-500">Cargando…</p>;
   if (error) {
@@ -38,6 +50,12 @@ export function ArticleList({
     );
   }
   if (!items.length) return <p className="text-gray-500">{emptyMessage}</p>;
+
+  const currentPage = Math.floor(currentCursor / pageSize) + 1;
+  const totalPages =
+    totalCount != null ? Math.ceil(totalCount / pageSize) : null;
+  const hasPrev = currentCursor > 0;
+  const hasNext = nextCursor != null && !!onNextPage;
 
   return (
     <>
@@ -52,28 +70,19 @@ export function ArticleList({
           />
         ))}
       </ul>
-      {(nextCursor != null || onFirstPage) && (
-        <div className="flex gap-2">
-          {onFirstPage && (
-            <button
-              type="button"
-              onClick={onFirstPage}
-              className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
-            >
-              Primera página
-            </button>
-          )}
-          {nextCursor != null && onNextPage && (
-            <button
-              type="button"
-              onClick={() => onNextPage(nextCursor)}
-              className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
-            >
-              Siguiente
-            </button>
-          )}
-        </div>
-      )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        pageSize={pageSize}
+        pageSizeOptions={PAGE_SIZE_OPTIONS}
+        hasPrev={hasPrev}
+        hasNext={hasNext}
+        onPrevPage={() => hasPrev && onPrevPage?.()}
+        onNextPage={() => nextCursor != null && onNextPage?.(nextCursor)}
+        onPageSizeChange={onPageSizeChange}
+      />
     </>
   );
 }

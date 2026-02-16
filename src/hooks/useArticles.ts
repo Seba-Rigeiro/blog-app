@@ -7,9 +7,9 @@ const defaultLimit = 10;
 /** Cache 2 min para no refetchear al volver del detalle al listado. */
 const LIST_STALE_MS = 2 * 60 * 1000;
 
-export function useArticles(cursor?: string) {
+export function useArticles(limit: number = defaultLimit, cursor?: string) {
   return trpc.article.list.useQuery(
-    { limit: defaultLimit, cursor },
+    { limit, cursor },
     {
       staleTime: LIST_STALE_MS,
       refetchOnMount: false, // no refetch al volver del detalle; tras eliminar se hace prefetch en onSuccess
@@ -71,9 +71,9 @@ export function useDeleteArticle() {
   });
 }
 
-export function useMyArticles(cursor?: string) {
+export function useMyArticles(limit: number = defaultLimit, cursor?: string) {
   return trpc.article.listByAuthor.useQuery({
-    limit: defaultLimit,
+    limit,
     cursor,
   });
 }

@@ -5,22 +5,28 @@ import { useArticles, useSearchArticles } from "@/hooks";
 import { ArticleList } from "@/features/articles";
 import { Input } from "@/components/ui";
 
+const PAGE_SIZE_OPTIONS = [5, 10, 20] as const;
+const DEFAULT_PAGE_SIZE = 10;
+
 export default function ArticlesPage() {
   const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [searchQ, setSearchQ] = useState("");
   const [submittedQ, setSubmittedQ] = useState("");
   const [searchCursor, setSearchCursor] = useState<string | undefined>(
     undefined,
   );
+  const [searchPageSize, setSearchPageSize] =
+    useState<number>(DEFAULT_PAGE_SIZE);
 
-  const { data, isLoading, error } = useArticles(cursor);
+  const { data, isLoading, error } = useArticles(pageSize, cursor);
   const {
     data: searchData,
     isLoading: searchLoading,
     error: searchError,
   } = useSearchArticles({
     q: submittedQ,
-    limit: 10,
+    limit: searchPageSize,
     cursor: searchCursor,
   });
 
@@ -36,6 +42,28 @@ export default function ArticlesPage() {
   const clearSearch = () => {
     setSubmittedQ("");
     setSearchQ("");
+    setSearchCursor(undefined);
+  };
+
+  const currentCursor = cursor ? parseInt(cursor, 10) : 0;
+  const handlePrevPage = () => {
+    const prevSkip = currentCursor - pageSize;
+    setCursor(prevSkip > 0 ? String(prevSkip) : undefined);
+  };
+
+  const searchCurrentCursor = searchCursor ? parseInt(searchCursor, 10) : 0;
+  const handleSearchPrevPage = () => {
+    const prevSkip = searchCurrentCursor - searchPageSize;
+    setSearchCursor(prevSkip > 0 ? String(prevSkip) : undefined);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCursor(undefined);
+  };
+
+  const handleSearchPageSizeChange = (size: number) => {
+    setSearchPageSize(size);
     setSearchCursor(undefined);
   };
 
@@ -80,19 +108,24 @@ export default function ArticlesPage() {
           {searchData && !searchLoading && (
             <>
               <p className="text-sm text-gray-600">
-                {searchData.items.length} resultado(s) para &quot;{submittedQ}
-                &quot;
+                {searchData.totalCount ?? searchData.items.length} resultado(s)
+                para &quot;{submittedQ}&quot;
               </p>
               <ArticleList
                 items={searchData.items}
                 isLoading={false}
                 error={null}
                 emptyMessage="No se encontraron artículos."
+                pageSize={searchPageSize}
+                currentCursor={searchCurrentCursor}
+                totalCount={searchData.totalCount}
                 nextCursor={searchData.nextCursor ?? null}
                 onNextPage={(next) => setSearchCursor(next)}
+                onPrevPage={handleSearchPrevPage}
                 onFirstPage={
                   searchCursor ? () => setSearchCursor(undefined) : undefined
                 }
+                onPageSizeChange={handleSearchPageSizeChange}
               />
             </>
           )}
@@ -103,9 +136,14 @@ export default function ArticlesPage() {
           isLoading={isLoading}
           error={error ? { message: error.message } : null}
           emptyMessage="No hay artículos publicados."
+          pageSize={pageSize}
+          currentCursor={currentCursor}
+          totalCount={data?.totalCount}
           nextCursor={data?.nextCursor ?? null}
           onNextPage={(next) => setCursor(next)}
+          onPrevPage={handlePrevPage}
           onFirstPage={cursor ? () => setCursor(undefined) : undefined}
+          onPageSizeChange={handlePageSizeChange}
         />
       )}
     </div>

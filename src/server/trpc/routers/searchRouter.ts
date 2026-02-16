@@ -47,7 +47,7 @@ export const searchRouter = router({
       }
 
       if (Object.keys(filter).length === 0) {
-        return { items: [], nextCursor: undefined };
+        return { items: [], nextCursor: undefined, totalCount: 0 };
       }
 
       const projection = {
@@ -59,18 +59,20 @@ export const searchRouter = router({
         updatedAt: 1,
         ...(input.q.trim() ? { score: { $meta: "textScore" } } : {}),
       };
-      const cursor = articles
-        .find(filter)
-        .sort(
-          input.q.trim()
-            ? { score: { $meta: "textScore" } }
-            : { createdAt: -1 },
-        )
-        .skip(skip)
-        .limit(take + 1)
-        .project(projection);
-
-      const items = await cursor.toArray();
+      const [totalCount, items] = await Promise.all([
+        articles.countDocuments(filter),
+        articles
+          .find(filter)
+          .sort(
+            input.q.trim()
+              ? { score: { $meta: "textScore" } }
+              : { createdAt: -1 },
+          )
+          .skip(skip)
+          .limit(take + 1)
+          .project(projection)
+          .toArray(),
+      ]);
       const nextCursor = items.length > take ? String(skip + take) : undefined;
       const authorIds = [
         ...new Set(items.slice(0, take).map((d) => d.authorId)),
@@ -91,6 +93,7 @@ export const searchRouter = router({
           authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
         })),
         nextCursor,
+        totalCount,
       };
     }),
 });

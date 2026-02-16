@@ -75,20 +75,23 @@ export const articleRouter = router({
     .query(async ({ input }) => {
       const articles = await getArticlesCollection();
       const { skip, take } = getSkipTake(input);
-      const cursor = articles
-        .find({})
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(take + 1)
-        .project({
-          title: 1,
-          content: 1,
-          imageUrl: 1,
-          authorId: 1,
-          createdAt: 1,
-          updatedAt: 1,
-        });
-      const items = await cursor.toArray();
+      const [totalCount, items] = await Promise.all([
+        articles.countDocuments({}),
+        articles
+          .find({})
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(take + 1)
+          .project({
+            title: 1,
+            content: 1,
+            imageUrl: 1,
+            authorId: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          })
+          .toArray(),
+      ]);
       const nextCursor = items.length > take ? String(skip + take) : undefined;
       const authorIds = [
         ...new Set(items.slice(0, take).map((d) => d.authorId)),
@@ -108,6 +111,7 @@ export const articleRouter = router({
           authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
         })),
         nextCursor,
+        totalCount,
       };
     }),
 
@@ -115,21 +119,25 @@ export const articleRouter = router({
     .input(paginationInputSchema)
     .query(async ({ ctx, input }) => {
       const articles = await getArticlesCollection();
+      const filter = { authorId: ctx.session.user.id };
       const { skip, take } = getSkipTake(input);
-      const cursor = articles
-        .find({ authorId: ctx.session.user.id })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(take + 1)
-        .project({
-          title: 1,
-          content: 1,
-          imageUrl: 1,
-          authorId: 1,
-          createdAt: 1,
-          updatedAt: 1,
-        });
-      const items = await cursor.toArray();
+      const [totalCount, items] = await Promise.all([
+        articles.countDocuments(filter),
+        articles
+          .find(filter)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(take + 1)
+          .project({
+            title: 1,
+            content: 1,
+            imageUrl: 1,
+            authorId: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          })
+          .toArray(),
+      ]);
       const nextCursor = items.length > take ? String(skip + take) : undefined;
       const authorIds = [
         ...new Set(items.slice(0, take).map((d) => d.authorId)),
@@ -149,6 +157,7 @@ export const articleRouter = router({
           authorName: nameByAuthor.get(d.authorId) ?? d.authorId,
         })),
         nextCursor,
+        totalCount,
       };
     }),
 
