@@ -17,6 +17,7 @@ import {
   getArticlesCollection,
   getAuthorNames,
 } from "@/db";
+import { parseObjectId } from "../parseObjectId";
 import { protectedProcedure, publicProcedure, router } from "../init";
 
 function toPublicArticle(doc: {
@@ -54,12 +55,7 @@ export const articleRouter = router({
     .input(getArticleByIdSchema)
     .query(async ({ input }) => {
       const articles = await getArticlesCollection();
-      let id: ObjectId;
-      try {
-        id = new ObjectId(input.id);
-      } catch {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "ID inválido" });
-      }
+      const id = parseObjectId(input.id);
       const doc = await articles.findOne({ _id: id });
       if (!doc) {
         throw new TRPCError({
@@ -165,12 +161,7 @@ export const articleRouter = router({
     .input(updateArticleSchema.and(getArticleByIdSchema))
     .mutation(async ({ ctx, input }) => {
       const articles = await getArticlesCollection();
-      let id: ObjectId;
-      try {
-        id = new ObjectId(input.id);
-      } catch {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "ID inválido" });
-      }
+      const id = parseObjectId(input.id);
       const existing = await articles.findOne({ _id: id });
       if (!existing) {
         throw new TRPCError({
@@ -194,12 +185,7 @@ export const articleRouter = router({
     .input(deleteArticleSchema)
     .mutation(async ({ ctx, input }) => {
       const articles = await getArticlesCollection();
-      let id: ObjectId;
-      try {
-        id = new ObjectId(input.id);
-      } catch {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "ID inválido" });
-      }
+      const id = parseObjectId(input.id);
       const existing = await articles.findOne({ _id: id });
       if (!existing) {
         throw new TRPCError({
