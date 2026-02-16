@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useArticles, useSearchArticles } from "@/hooks";
 import { ArticleList } from "@/features/articles";
-import { Input } from "@/components/ui";
+import { Input, Loading } from "@/components/ui";
 
-const PAGE_SIZE_OPTIONS = [5, 10, 20] as const;
 const DEFAULT_PAGE_SIZE = 10;
 
 export default function ArticlesPage() {
@@ -99,7 +98,7 @@ export default function ArticlesPage() {
 
       {isSearchMode ? (
         <>
-          {searchLoading && <p className="text-gray-500">Buscando…</p>}
+          {searchLoading && <Loading message="Buscando…" />}
           {searchError && (
             <p className="text-red-600" role="alert">
               {searchError.message}

@@ -1,6 +1,7 @@
 "use client";
 
 import { LinkButton } from "@/components/ui/LinkButton";
+import { Loading } from "@/components/ui";
 import { trpc } from "@/server/trpc/client";
 import { ArticleListItem, AuthorsSection } from "@/features/articles";
 
@@ -27,7 +28,7 @@ export default function HomePage() {
 
       <section>
         <h2 className="text-lg font-semibold">Últimos 5 artículos</h2>
-        {isLoading && <p className="mt-2 text-gray-500">Cargando…</p>}
+        {isLoading && <Loading className="mt-2" />}
         {error && (
           <p className="mt-2 text-red-600" role="alert">
             Error al cargar artículos. Revisá la conexión.

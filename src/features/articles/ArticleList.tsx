@@ -1,6 +1,6 @@
 "use client";
 
-import { Pagination } from "@/components/ui/Pagination";
+import { Loading, Pagination } from "@/components/ui";
 import { ArticleListItem } from "./ArticleListItem";
 
 export type ArticleListItemData = {
@@ -41,7 +41,7 @@ export function ArticleList({
   onPrevPage,
   onPageSizeChange,
 }: ArticleListProps) {
-  if (isLoading) return <p className="text-gray-500">Cargando…</p>;
+  if (isLoading) return <Loading />;
   if (error) {
     return (
       <p className="text-red-600" role="alert">

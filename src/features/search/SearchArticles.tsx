@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchArticles } from "@/hooks";
 import { ArticleListItem } from "@/features/articles";
-import { Input } from "@/components/ui";
+import { Input, Loading } from "@/components/ui";
 
 export function SearchArticles() {
   const [q, setQ] = useState("");
@@ -41,7 +41,7 @@ export function SearchArticles() {
 
       {submitted && (
         <>
-          {isLoading && <p className="text-gray-500">Buscando…</p>}
+          {isLoading && <Loading message="Buscando…" />}
           {error && (
             <p className="text-red-600" role="alert">
               {error.message}

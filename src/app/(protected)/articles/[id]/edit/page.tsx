@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useArticleById, useUpdateArticle, useCurrentUser } from "@/hooks";
 import { ArticleForm, type ArticleFormData } from "@/features/articles";
+import { Loading } from "@/components/ui";
 
 export default function EditArticlePage() {
   const params = useParams();
@@ -14,8 +15,7 @@ export default function EditArticlePage() {
   const { user, isPending: userPending } = useCurrentUser();
 
   if (!id) return <p className="text-red-600">ID inválido</p>;
-  if (isLoading || userPending)
-    return <p className="text-gray-500">Cargando…</p>;
+  if (isLoading || userPending) return <Loading fullScreen />;
   if (error) {
     return (
       <div>

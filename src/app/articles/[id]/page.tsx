@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useArticleById, useDeleteArticle, useCurrentUser } from "@/hooks";
 import { ArticleDetail } from "@/features/articles";
+import { Loading } from "@/components/ui";
 
 export default function ArticleDetailPage() {
   const params = useParams();
@@ -16,7 +17,7 @@ export default function ArticleDetailPage() {
 
   if (!id) return <p className="text-red-600">ID inválido</p>;
 
-  if (isLoading) return <p className="text-gray-500">Cargando…</p>;
+  if (isLoading) return <Loading fullScreen />;
 
   if (error) {
     return (
