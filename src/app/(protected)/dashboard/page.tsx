@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAuth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { MyArticlesList } from "@/features/articles";
 
 export default async function DashboardPage() {
   const auth = await getAuth();
@@ -15,11 +16,14 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen p-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-2xl font-bold">Mis artículos</h1>
       <p className="mt-2 text-gray-600">
-        Hola, <strong>{name}</strong> ({user.email})
+        Hola, <strong>{name}</strong>. Aquí puedes ver tus artículos listados.
       </p>
-      <p className="mt-4">
+      <section className="mt-6" aria-label="Listado de mis artículos">
+        <MyArticlesList />
+      </section>
+      <p className="mt-6">
         <Link href="/" className="text-blue-600 underline">
           Volver al inicio
         </Link>
