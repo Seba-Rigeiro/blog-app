@@ -1,25 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useArticleById, useUpdateArticle, useCurrentUser } from "@/hooks";
 import { ArticleForm, type ArticleFormData } from "@/features/articles";
-import { Loading } from "@/components/ui";
+import { ErrorToast, Loading } from "@/components/ui";
 
 export default function EditArticlePage() {
   const params = useParams();
   const router = useRouter();
   const id = typeof params.id === "string" ? params.id : null;
-  const { data: article, isLoading, error } = useArticleById(id);
-  const update = useUpdateArticle();
+  const [error, setError] = useState<string | null>(null);
+  const { data: article, isLoading, error: queryError } = useArticleById(id);
+  const update = useUpdateArticle({
+    onError: (err) => setError(err.message),
+  });
   const { user, isPending: userPending } = useCurrentUser();
 
   if (!id) return <p className="text-red-600">ID inválido</p>;
   if (isLoading || userPending) return <Loading fullScreen />;
-  if (error) {
+  if (queryError) {
     return (
       <div>
-        <p className="text-red-600">{error.message}</p>
+        <p className="text-red-600">{queryError.message}</p>
         <Link
           href="/articles"
           className="mt-2 inline-block text-blue-600 underline"
@@ -59,17 +63,20 @@ export default function EditArticlePage() {
   };
 
   return (
-    <ArticleForm
-      key={article.id}
-      mode="edit"
-      defaultValues={{
-        title: article.title,
-        content: article.content,
-        imageUrl: article.imageUrl ?? "",
-      }}
-      onSubmit={onSubmit}
-      isPending={update.isPending}
-      onCancel={() => router.push(`/articles/${id}`)}
-    />
+    <>
+      <ArticleForm
+        key={article.id}
+        mode="edit"
+        defaultValues={{
+          title: article.title,
+          content: article.content,
+          imageUrl: article.imageUrl ?? "",
+        }}
+        onSubmit={onSubmit}
+        isPending={update.isPending}
+        onCancel={() => router.push(`/articles/${id}`)}
+      />
+      <ErrorToast message={error} onDismiss={() => setError(null)} />
+    </>
   );
 }

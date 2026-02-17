@@ -29,7 +29,6 @@ export function ArticleForm({
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm<ArticleFormData>({
     resolver: zodResolver(createArticleSchema),
@@ -48,14 +47,8 @@ export function ArticleForm({
         content: data.content,
         imageUrl: data.imageUrl === "" ? undefined : data.imageUrl,
       });
-    } catch (err) {
-      const message =
-        err && typeof err === "object" && "message" in err
-          ? String((err as { message: unknown }).message)
-          : mode === "create"
-            ? "Error al crear"
-            : "Error al guardar";
-      setError("root", { message });
+    } catch {
+      // Errores de mutación se muestran en el toast global (onError en hooks)
     }
   };
 
@@ -69,11 +62,6 @@ export function ArticleForm({
     <div className="max-w-xl space-y-6">
       <h1 className="text-2xl font-bold">{title}</h1>
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-        {errors.root && (
-          <p className="text-sm text-red-600" role="alert">
-            {errors.root.message}
-          </p>
-        )}
         <FormField id="title" label="Título" error={errors.title?.message}>
           <Input id="title" {...register("title")} />
         </FormField>

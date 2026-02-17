@@ -2,6 +2,8 @@
 
 import { trpc } from "@/server/trpc/client";
 
+export type ArticleMutationErrorHandler = (err: Error) => void;
+
 const defaultLimit = 10;
 
 /** Cache 2 min para no refetchear al volver del detalle al listado. */
@@ -31,7 +33,9 @@ export function useArticleById(id: string | null) {
   );
 }
 
-export function useCreateArticle() {
+export function useCreateArticle(options?: {
+  onError?: ArticleMutationErrorHandler;
+}) {
   const utils = trpc.useUtils();
   return trpc.article.create.useMutation({
     onSuccess: async () => {
@@ -42,10 +46,13 @@ export function useCreateArticle() {
       });
       void utils.user.getAuthorsWithArticleCount.invalidate();
     },
+    onError: options?.onError,
   });
 }
 
-export function useUpdateArticle() {
+export function useUpdateArticle(options?: {
+  onError?: ArticleMutationErrorHandler;
+}) {
   const utils = trpc.useUtils();
   return trpc.article.update.useMutation({
     onSuccess: () => {
@@ -53,10 +60,13 @@ export function useUpdateArticle() {
       void utils.article.getById.invalidate();
       void utils.user.getAuthorsWithArticleCount.invalidate();
     },
+    onError: options?.onError,
   });
 }
 
-export function useDeleteArticle() {
+export function useDeleteArticle(options?: {
+  onError?: ArticleMutationErrorHandler;
+}) {
   const utils = trpc.useUtils();
   return trpc.article.delete.useMutation({
     onSuccess: async () => {
@@ -68,6 +78,7 @@ export function useDeleteArticle() {
       void utils.article.listByAuthor.invalidate();
       void utils.user.getAuthorsWithArticleCount.invalidate();
     },
+    onError: options?.onError,
   });
 }
 
