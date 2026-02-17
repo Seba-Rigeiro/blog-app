@@ -1,13 +1,19 @@
 /**
  * searchRouter: búsqueda server-side por título, texto, autor.
- * Usa índice de texto MongoDB y paginación.
+ * Usa $regex para coincidencia parcial (ej. "articul" encuentra "articulo").
+ * Paginación. Coste: regex sobre content hace scan; aceptable para blogs pequeños/medianos.
  */
 
 import { ObjectId } from "mongodb";
 import { searchArticlesSchema } from "@/schemas/search";
 import { getSkipTake } from "@/schemas/pagination";
-import { ensureIndexes, getArticlesCollection, getAuthorNames } from "@/db";
+import { getArticlesCollection, getAuthorNames } from "@/db";
 import { publicProcedure, router } from "../init";
+
+/** Escapa caracteres especiales de regex para usar el término como texto literal. */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 function toPublicArticle(doc: {
   _id: ObjectId;
@@ -38,12 +44,19 @@ export const searchRouter = router({
 
       const filter: Record<string, unknown> = {};
 
-      if (input.q.trim()) {
-        await ensureIndexes(); // necesario para $text (índice de texto en articles)
-        filter.$text = { $search: input.q.trim() };
-      }
       if (input.authorId) {
         filter.authorId = input.authorId;
+      }
+
+      const q = input.q.trim();
+      if (q) {
+        const regex = new RegExp(escapeRegex(q), "i");
+        const textCondition = {
+          $or: [{ title: { $regex: regex } }, { content: { $regex: regex } }],
+        };
+        const andList = (filter.$and as unknown[] | undefined) ?? [];
+        andList.push(textCondition);
+        filter.$and = andList;
       }
 
       if (Object.keys(filter).length === 0) {
@@ -57,17 +70,12 @@ export const searchRouter = router({
         authorId: 1,
         createdAt: 1,
         updatedAt: 1,
-        ...(input.q.trim() ? { score: { $meta: "textScore" } } : {}),
       };
       const [totalCount, items] = await Promise.all([
         articles.countDocuments(filter),
         articles
           .find(filter)
-          .sort(
-            input.q.trim()
-              ? { score: { $meta: "textScore" } }
-              : { createdAt: -1 },
-          )
+          .sort({ createdAt: -1 })
           .skip(skip)
           .limit(take + 1)
           .project(projection)

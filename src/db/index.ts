@@ -9,7 +9,7 @@ export {
   getUsersCollection,
   getArticlesCollection,
 } from "./collections";
-export { ensureIndexes } from "./indexes";
+export { ensureIndexes, ensureIndexesOnce } from "./indexes";
 export {
   createUser,
   createArticle,
