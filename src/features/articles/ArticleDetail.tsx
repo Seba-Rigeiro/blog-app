@@ -10,6 +10,7 @@ export type ArticleDetailData = {
   createdAt: Date | string;
   updatedAt: Date | string;
   authorId: string;
+  authorName?: string;
 };
 
 type ArticleDetailProps = {
@@ -56,6 +57,7 @@ export function ArticleDetail({
         )}
       </div>
       <p className="text-sm text-gray-500">
+        {article.authorName && <span>{article.authorName} – </span>}
         {created.toLocaleDateString("es")}
         {wasUpdated && (
           <span> · Actualizado {updated.toLocaleDateString("es")}</span>

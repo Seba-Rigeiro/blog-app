@@ -63,7 +63,12 @@ export const articleRouter = router({
           message: "Artículo no encontrado",
         });
       }
-      return toPublicArticle(doc);
+      const nameByAuthor = await getAuthorNames([doc.authorId]);
+      const authorName = nameByAuthor.get(doc.authorId) ?? doc.authorId;
+      return {
+        ...toPublicArticle(doc),
+        authorName,
+      };
     }),
 
   list: publicProcedure
