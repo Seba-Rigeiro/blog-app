@@ -2,7 +2,8 @@
 
 import { trpc } from "@/server/trpc/client";
 
-export type ArticleMutationErrorHandler = (err: Error) => void;
+/** Compatible con Error y con el error que pasa tRPC en onError (TRPCClientErrorLike). */
+export type ArticleMutationErrorHandler = (err: { message: string }) => void;
 
 const defaultLimit = 10;
 
