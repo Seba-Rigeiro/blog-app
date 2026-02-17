@@ -2,6 +2,8 @@
 
 CMS de artículos de blog — Next.js (App Router), TypeScript, tRPC, BetterAuth, MongoDB.
 
+**Documentación del proyecto (especificación y prompt inicial):** [Initial-prompt.md](./Initial-prompt.md)
+
 ## Stack
 
 | Capa         | Tecnología                    |
@@ -63,14 +65,14 @@ npm start
 ```
 src/
   app/          # App Router (layout, pages, api)
-  components/  # UI reutilizables
-  features/     # Lógica por dominio
-  server/       # tRPC (init, routers)
-  db/           # Cliente MongoDB
-  hooks/        # Custom hooks
+  components/   # UI reutilizables (layout, ui)
+  features/     # Lógica por dominio (articles, auth, search)
+  server/trpc/  # tRPC (init, routers, client)
+  db/           # Cliente MongoDB, colecciones, índices, queries
+  hooks/        # Custom hooks (useArticles, useAuth, useSearchArticles, etc.)
   schemas/      # Zod (auth, articles, search, pagination)
   types/        # Tipos globales
-  lib/          # Utilidades
+  lib/          # Utilidades (auth, utils)
 ```
 
 ## Deploy
