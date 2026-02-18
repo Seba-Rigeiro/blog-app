@@ -30,9 +30,7 @@ export async function getMongoClient(): Promise<MongoClient> {
   const client = new MongoClient(uri, options);
   await client.connect();
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForMongo.mongoClient = client;
-  }
+  globalForMongo.mongoClient = client;
 
   return client;
 }
